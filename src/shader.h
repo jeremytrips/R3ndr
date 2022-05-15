@@ -14,6 +14,7 @@ public:
 
     void use();
     void checkShaderCompilation(unsigned int shader);
+    void checkProgramCompilation(unsigned int program);
 };
 
 
