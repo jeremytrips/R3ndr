@@ -22,8 +22,7 @@ Shader::Shader(const char* fragmentSource, const char* vertexSource)
 	glAttachShader(m_shaderProgram, m_fragmentShader);
 	glLinkProgram(m_shaderProgram);
 
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-
+    checkProgramCompilation(m_shaderProgram);
 	
     glDeleteShader(m_vertexShader);
 	glDeleteShader(m_fragmentShader);  
@@ -47,12 +46,12 @@ void Shader::checkShaderCompilation(unsigned int shader) {
 }
 
 void Shader::checkProgramCompilation(unsigned int program) {
-    int succes;
+    int success;
     char infoLog[512];
-
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if(!success) {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+    glGetProgramiv(m_shaderProgram, GL_LINK_STATUS, &success);
+    if(!success)
+    {
+        glGetProgramInfoLog(m_shaderProgram, 512, NULL, infoLog);
         std::cout << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n" << infoLog << std::endl;
         exit(EXIT_FAILURE);
     }
