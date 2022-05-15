@@ -1,26 +1,36 @@
-cmake_minimum_required(VERSION 3.13)  # CMake version check
-project(R3ndr)               # Create project "simple_example"
-set(CMAKE_CXX_STANDARD 14)            # Enable c++14 standard
+cmake_minimum_required(VERSION 3.21)
+project(glCraft)
 
-INCLUDE_DIRECTORIES(
-    ${PROJECT_SOURCE_DIR}/vendors/glfw/include
-    ${PROJECT_SOURCE_DIR}/vendors/glfw/deps
+set(CMAKE_CXX_STANDARD 23)
+
+if (CMAKE_BUILD_TYPE MATCHES Release)
+    set(CMAKE_CXX_FLAGS "-O3")
+elseif (CMAKE_BUILD_TYPE MATCHES Debug)
+    set(CMAKE_CXX_FLAGS "-g")
+endif ()
+
+file(GLOB_RECURSE main_sources src/*.cpp)
+add_executable(main ${main_sources})
+
+# glfw
+add_subdirectory(third_party/glfw EXCLUDE_FROM_ALL)
+
+# GLAD
+add_subdirectory(third_party/GLAD EXCLUDE_FROM_ALL)
+
+# glm
+add_subdirectory(third_party/glm EXCLUDE_FROM_ALL)
+
+
+# include FastNoiseLite
+include_directories(main third_party/FastNoiseLite)
+
+# link glfw to imgui and link everything to the main app
+target_link_libraries(main PRIVATE glfw glm glad imgui lodepng)
+
+# set a symlink to the assets dir
+add_custom_command(
+        TARGET main PRE_BUILD COMMAND
+        ${CMAKE_COMMAND} -E create_symlink
+        ${CMAKE_SOURCE_DIR}/assets ${CMAKE_CURRENT_BINARY_DIR}/assets
 )
-
-set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-
-add_subdirectory(${PROJECT_SOURCE_DIR}/vendors/glfw/)
-
-# Glad
-add_library(
-    Glad STATIC
-    "vendors/glad/src/glad.c"
-)
-target_include_directories(Glad PUBLIC "vendors/glad/include")
-
-find_package(OpenGL REQUIRED)
-
-add_executable(R3ndr main.cpp )
-target_link_libraries(R3ndr glfw OpenGL::GL Glad)
