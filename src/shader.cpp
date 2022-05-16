@@ -1,6 +1,9 @@
 #include "shader.h"
 #include <glad/glad.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -66,11 +69,11 @@ void Shader::createShaderProgram(const char* fragmentSource, const char* vertexS
     m_fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(m_vertexShader, 1, &vertexSource, NULL);
 	glCompileShader(m_vertexShader);
-    checkShaderCompilation(m_vertexShader, "VERTEX");
+    checkShaderCompilation(m_vertexShader, (char*)"VERTEX");
 
     glShaderSource(m_fragmentShader, 1, &fragmentSource, NULL);
 	glCompileShader(m_fragmentShader);
-    checkShaderCompilation(m_fragmentShader, "FRAGMENT");
+    checkShaderCompilation(m_fragmentShader, (char*)"FRAGMENT");
 
     m_shaderProgram = glCreateProgram();
     glAttachShader(m_shaderProgram, m_vertexShader);
@@ -122,4 +125,14 @@ void Shader::setInt(const std::string &name, int value) const
 void Shader::setFloat(const std::string &name, float value) const
 { 
     glUniform1f(glGetUniformLocation(m_shaderProgram, name.c_str()), value); 
+} 
+
+void Shader::setMat4(const std::string &name, glm::mat4 trans) const
+{ 
+    glUniformMatrix4fv(
+        glGetUniformLocation(m_shaderProgram, name.c_str()), 
+        1,
+        GL_FALSE,
+        glm::value_ptr(trans)
+    ); 
 } 

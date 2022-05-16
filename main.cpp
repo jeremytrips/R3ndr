@@ -2,7 +2,10 @@
 #define GLFW_INCLUDE_NONE
 #define STB_IMAGE_IMPLEMENTATION
 #include <GLFW/glfw3.h>
+
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
  
 #include <filesystem>
 #include <stdlib.h>
@@ -109,8 +112,12 @@ int main(void)
     }
     stbi_image_free(data);
 
-
-	shader.use();
+    glm::mat4 trans = glm::mat4(1.0f);
+    trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
+    trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+	
+    shader.use();
+    shader.setMat4("transform", trans);
 
 	while(!glfwWindowShouldClose(window))
 	{
@@ -125,6 +132,11 @@ int main(void)
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 		// glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+
+        glm::mat4 trans = glm::mat4(1.0f);
+        trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+        shader.setMat4("transform", trans);
 
 		
 		glfwSwapBuffers(window);
