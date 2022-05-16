@@ -21,6 +21,8 @@ add_subdirectory(vendors/glad EXCLUDE_FROM_ALL)
 # glm
 add_subdirectory(vendors/glm EXCLUDE_FROM_ALL)
 
+#stb
+include_directories(vendors/stb/)
 
 # link glfw to imgui and link everything to the main app
 target_link_libraries(R3ndr PRIVATE glfw glm glad)

@@ -1,11 +1,13 @@
 #include <glad/glad.h>
 #define GLFW_INCLUDE_NONE
+#define STB_IMAGE_IMPLEMENTATION
 #include <GLFW/glfw3.h>
- 
  
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
+#include <stb_image.h>
+
 
 #include "src/shader.h"
  
@@ -13,26 +15,16 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 
 float vertices[] = {
-    -0.5f, -0.5f, 0.0f,
-     0.5f, -0.5f, 0.0f,
-     0.0f,  0.5f, 0.0f
+	//pos 				 // Color 	
+     0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // bottom right
+    -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // bottom left
+     0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // top 
+
 };
 
-const char *vertexShaderSource = "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "}\0";
 
-const char* fragmentShaderSource = "#version 330 core\n"
-	"out vec4 FragColor;\n"
-	"void main()\n"
-	"{\n"
-	"    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-	"}\0";
-
-
+int width, height, nrChannels;
+unsigned char *data = stbi_load("assets/wall.jpg", &width, &height, &nrChannels, 0); 
 
 
 
@@ -58,7 +50,7 @@ int main(void)
 		return -1;
 	}
 
-	Shader* test = new Shader(fragmentShaderSource, vertexShaderSource);
+	Shader shader("./src/shaders/baseShader.shader");
 
 	glViewport(0, 0, 800, 600);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);  
@@ -83,7 +75,28 @@ int main(void)
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);  
 
-	test->use();
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	// color attribute
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3* sizeof(float)));
+	glEnableVertexAttribArray(1);
+
+
+	unsigned int texture;
+	glGenTextures(1, &texture);  
+	glBindTexture(GL_TEXTURE_2D, texture); 
+
+	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
+	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	stbi_image_free(data);
+
+	shader.use();
 
 	while(!glfwWindowShouldClose(window))
 	{
@@ -93,6 +106,9 @@ int main(void)
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 				
+		
+		float timeValue = glfwGetTime();
+		shader.setFloat("timeValue", timeValue);
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 
@@ -102,7 +118,6 @@ int main(void)
 	}
 	glDisableVertexAttribArray(0);
 
-	delete test;
     glfwTerminate();
     exit(EXIT_SUCCESS);
 
