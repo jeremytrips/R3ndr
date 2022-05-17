@@ -63,6 +63,9 @@ float vertices[] = {
     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 };
 
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 1.0f);
+glm::vec3 cameraDirection = glm::normalize(glm::vec3(0.0f, 0.0f, 1.0f));
+glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
 
 
 int main(void)
@@ -125,7 +128,7 @@ int main(void)
     // load image, create texture and generate mipmaps
     int width, height, nrChannels;
 
-    unsigned char *data = stbi_load("assets/wall.jpg", &width, &height, &nrChannels, 0);
+    unsigned char *data = stbi_load("assets/box.jpg", &width, &height, &nrChannels, 0);
     if (data)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
@@ -138,11 +141,24 @@ int main(void)
     stbi_image_free(data);
 
     glm::mat4 trans = glm::mat4(1.0f);
-    trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
+    trans = glm::rotate(trans, glm::radians(63.0f), glm::vec3(1.0, 0.3, 0.5));
     trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
-    
+
     shader.use();
-    shader.setInt("_texture", texture);
+    shader.setInt("_texture", 0);
+    shader.setMat4("model", trans);
+
+    glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
+    glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
+    glm::mat4 view;
+    view = glm::lookAt(
+        cameraPos, 
+  	    cameraTarget, 
+	    up
+    );
+    shader.setMat4("view", view);
+    
 
     while(!glfwWindowShouldClose(window))
     {
@@ -150,7 +166,13 @@ int main(void)
         
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        
+        view = glm::lookAt(
+            cameraPos, 
+  	        cameraTarget, 
+	        up
+        );
+        shader.setMat4("view", view);
+
         // render here
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
@@ -175,6 +197,28 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 void processInput(GLFWwindow *window)
 {
+
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+    const float cameraSpeed = 0.01f; // adjust accordingly
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
+        std::cout << "Z" << std::endl;
+        cameraPos += cameraSpeed * cameraDirection;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS){
+        cameraPos -= cameraSpeed * cameraDirection;
+        std::cout << "S" << std::endl;
+
+    }
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS){
+        cameraPos -= glm::normalize(glm::cross(cameraDirection, up)) * cameraSpeed;
+        std::cout << "Q" << std::endl;
+
+    }
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS){
+        cameraPos += glm::normalize(glm::cross(cameraDirection, up)) * cameraSpeed;
+        std::cout << "D" << std::endl;
+
+    }
 }
