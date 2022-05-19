@@ -4,6 +4,9 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <GLFW/glfw3.h>
 
+#include <ft2build.h>
+#include FT_FREETYPE_H  
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -15,6 +18,7 @@
 #include "src/camera.h"
 #include "src/cube.h"
 #include "src/texturedCube.h"
+#include "src/line.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -48,6 +52,28 @@ int main()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 
+    FT_Library ft;
+    if (FT_Init_FreeType(&ft))
+    {
+        std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
+        return -1;
+    }
+
+    FT_Face face;
+    if (FT_New_Face(ft, "/home/jtsidis/dev/R3ndr/assets/font/DejaVuSans.ttf", 0, &face))
+    {
+        std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;  
+        return -1;
+    }
+
+    FT_Set_Pixel_Sizes(face, 0, 48);  
+
+    if (FT_Load_Char(face, 'X', FT_LOAD_RENDER))
+    {
+        std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;  
+        return -1;
+    }
+
     // glfw window creation
     // --------------------
     GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
@@ -73,28 +99,46 @@ int main()
     glEnable(GL_DEPTH_TEST);
 
 
-    TexturedCube test("/home/jtsidis/dev/R3ndr/assets/box.jpg");
-    // Cube test;
+    // TexturedCube test("/home/jtsidis/dev/R3ndr/assets/box.jpg");
+    Cube test;
     glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-    test.shader.setMat4("view", projection);
+    
+    Line line1(glm::vec3(0,0,0), glm::vec3(1,0,0));
+    line1.setColor(glm::vec3(1,0,0));
+    Line line2(glm::vec3(0,0,0), glm::vec3(0,1,0));
+    line2.setColor(glm::vec3(0,1,0));
+    Line line3(glm::vec3(0,0,0), glm::vec3(0,0,1));
+    line3.setColor(glm::vec3(0,0,1));
 
+    // Shader shader("/home/jtsidis/dev/R3ndr/src/shaders/baseShader.shader");
+    // shader.bind();
+    // TexturedCube cube()
 
     while (!glfwWindowShouldClose(window))
     {
         auto currentFrame = static_cast<float>(glfwGetTime());
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
+        
+        // shader.setMat4("view", camera.GetViewMatrix());
+        glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
+        // shader.setMat4("projection", projection);
+        glm::mat4 view = camera.GetViewMatrix();
         processInput(window);
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        
+        line1.setMVP(projection * view);
+        line2.setMVP(projection * view);
+        line3.setMVP(projection * view);
+ 
+        line1.draw();
+        line2.draw();
+        line3.draw();
         test.shader.setMat4("projection", projection);
-
-        glm::mat4 view = camera.GetViewMatrix();
         test.shader.setMat4("view", view);
-
         test.render();
 
         glfwSwapBuffers(window);
@@ -119,6 +163,7 @@ void processInput(GLFWwindow *window)
         camera.ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.ProcessKeyboard(RIGHT, deltaTime);
+    std::cout << camera.GetPosition().x << " " << camera.GetPosition().y << " " << camera.GetPosition().z  << std::endl;
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes

@@ -51,6 +51,10 @@ public:
         return m_zoom;
     }
 
+    glm::vec3 GetPosition() const {
+        return m_position;
+    }
+
 private:
     // calculates the front vector from the Camera's (updated) Euler Angles
     void updateCameraVectors();

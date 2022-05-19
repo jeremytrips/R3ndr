@@ -113,9 +113,8 @@ void TexturedCube::render() const {
 }
 
 TexturedCube::~TexturedCube() {
-    glBindTexture(1, 0);
-    glDeleteTextures(1, &m_texture);
-    glDeleteVertexArrays(1, &m_vao);
-    glDeleteBuffers(1, &m_vbo);
+    // glDeleteTextures(1, &m_texture);
+    // glDeleteVertexArrays(1, &m_vao);
+    // glDeleteBuffers(1, &m_vbo);
 }
 
