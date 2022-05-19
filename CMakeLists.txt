@@ -7,9 +7,10 @@ if (CMAKE_BUILD_TYPE MATCHES Release)
     set(CMAKE_CXX_FLAGS "-O3")
 elseif (CMAKE_BUILD_TYPE MATCHES Debug)
     set(CMAKE_CXX_FLAGS "-g")
-endif ()
+endif()
 
 file(GLOB_RECURSE main_sources src/*.cpp)
+message(${main_sources})
 add_executable(R3ndr main.cpp ${main_sources})
 
 # glfw

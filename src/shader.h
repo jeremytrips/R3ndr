@@ -18,7 +18,8 @@ public:
     Shader(const std::string fileName);
     ~Shader();
 
-    void use();
+    void bind() const;
+    void unBind() const;
 
     void setBool(const std::string &name, bool value) const;
     void setInt(const std::string &name, int value) const;

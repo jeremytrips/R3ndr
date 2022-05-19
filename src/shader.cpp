@@ -110,8 +110,12 @@ void Shader::checkProgramCompilation(unsigned int program) {
     }
 }
 
-void Shader::use(){
+void Shader::bind() const {
 	glUseProgram(m_shaderProgram);
+}
+
+void Shader::unBind() const {
+    glUseProgram(0);
 }
 
 void Shader::setBool(const std::string &name, bool value) const
