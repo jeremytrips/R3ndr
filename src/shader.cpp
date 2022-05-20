@@ -140,3 +140,7 @@ void Shader::setMat4(const std::string &name, glm::mat4 trans) const
         glm::value_ptr(trans)
     ); 
 } 
+
+void Shader::setVec3(const std::string &name, glm::vec3 value) const {
+        glUniform3f(glGetUniformLocation(m_shaderProgram, name.c_str()), value.x, value.y, value.z);
+}

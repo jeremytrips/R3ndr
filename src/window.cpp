@@ -2,6 +2,7 @@
 
 #include <string>
 #include <iostream>
+#include <glad/glad.h>
 
 
 Window::Window(int width, int height, std::string title): 
@@ -18,6 +19,15 @@ Window::Window(int width, int height, std::string title):
         glfwTerminate();
         exit(-1);
     }
+    
     glfwMakeContextCurrent(m_window);
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    {
+        std::cout << "Failed to initialize GLAD" << std::endl;
+        exit(-1);
+    }
+    
+    glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glEnable(GL_DEPTH_TEST);
 
 }

@@ -21,7 +21,7 @@ add_subdirectory(vendors/glad EXCLUDE_FROM_ALL)
 
 # glm
 add_subdirectory(vendors/glm EXCLUDE_FROM_ALL)
-
+ 
 # Freetype
 find_package(Freetype REQUIRED)
 target_include_directories(R3ndr PRIVATE ${FREETYPE_INCLUDE_DIRS})

@@ -1,7 +1,6 @@
 #pragma once
  
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <vector>
 
@@ -25,7 +24,7 @@ public:
             "uniform mat4 MVP;\n"
             "void main()\n"
             "{\n"
-            "   gl_Position = MVP * vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+            "   gl_Position = MVP * vec4(aPos.xyz, 1.0);\n"
             "}\0";
         const char *fragmentShaderSource = "#version 330 core\n"
             "out vec4 FragColor;\n"
