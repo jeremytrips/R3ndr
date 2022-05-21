@@ -18,7 +18,7 @@ public:
      ~TextRenderer();
     void renderText(std::string text, glm::vec2 pos, float scale=1);
 
-    void SetProjectionMatrix(int width, int height);
+    void SetProjectionMatrix(float width, float height);
 private:
     std::map<char, Character> m_characters;
     Shader m_shader;
