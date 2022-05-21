@@ -18,7 +18,7 @@ public:
     Shader(const std::string fileName);
     ~Shader();
 
-    unsigned int GetProgramId() {
+    unsigned int GetProgramId() const {
         return m_shaderProgram;
     }
 

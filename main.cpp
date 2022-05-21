@@ -10,6 +10,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/matrix_access.hpp>
 
 #include <filesystem>
 #include <iostream>
@@ -20,13 +21,12 @@
 #include "src/window.h"
 #include "src/shader.h"
 #include "src/text_renderer.h"
+#include "src/cube.h"
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window);
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
-
-void RenderText(Shader &s, std::string text, float x, float y, float scale, glm::vec3 color);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
@@ -43,14 +43,13 @@ float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 
 // timing
-float deltaTime = 0.0f; // time between current frame and last frame
+float deltaTime = 0.0f; // time between current fra<me and last frame
 float lastFrame = 0.0f;
 
 
 int main()
 {
     GLFWwindow *window = win.getWindow();
-
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
@@ -63,6 +62,9 @@ int main()
     Line* line3 = new Line(glm::vec3(0, 0, 0), glm::vec3(0, 0, 1));
     line3->setColor(glm::vec3(0, 0, 1));
     
+    Cube* cube= new Cube();
+
+
     while (!glfwWindowShouldClose(window))
     {
         auto currentFrame = static_cast<float>(glfwGetTime());
@@ -70,24 +72,31 @@ int main()
         lastFrame = currentFrame;
 
         // shader.setMat4("view", camera.GetViewMatrix());
-        glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-        glm::mat4 view = camera.GetViewMatrix();
-
         processInput(window);
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
+        char pos[150];
+        glm::vec3 camPos = camera.GetPosition();
+        sprintf(pos, "pos: %.2f %.2f %.2f", camPos.x, camPos.y, camPos.z);
+        textRenderer.renderText(pos, glm::vec2(0, 0), 0.5);
 
-        char dest_string[150];
-        sprintf(dest_string, "POS: %.3f %.3f %.3f", camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
-        textRenderer.renderText(dest_string, glm::vec2(25, 25), 1);
+        glm::mat4 projection =  glm::perspective(glm::radians(camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        glm::mat4 view = camera.GetViewMatrix();
 
-        line1->setMVP(projection * view);
-        line2->setMVP(projection * view);
-        line3->setMVP(projection * view);
+        cube->preRender();
+        cube->SetProjection(projection);
+        cube->SetView(view);
+        cube->render();
+
+        line1->setMVP(view*projection);
+        line2->setMVP(view*projection);
+        line3->setMVP(view*projection);
 
         line1->draw();
         line2->draw();
         line3->draw();
+
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -95,6 +104,7 @@ int main()
     delete line1;
     delete line2;
     delete line3;
+    delete cube;
     glfwTerminate();
     return 0;
 }
@@ -118,7 +128,6 @@ void processInput(GLFWwindow *window)
         camera.ProcessKeyboard(UP, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
         camera.ProcessKeyboard(DOWN, deltaTime);
-    std::cout << camera.GetPosition().x << " " << camera.GetPosition().y << " " << camera.GetPosition().z << std::endl;
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
