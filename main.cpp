@@ -22,6 +22,7 @@
 #include "src/shader.h"
 #include "src/text_renderer.h"
 #include "src/cube.h"
+#include "src/cubeWithNormals.h"
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -29,15 +30,15 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 
 // settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+unsigned int SCR_WIDTH = 800;
+unsigned int SCR_HEIGHT = 600;
 
 Window win(SCR_WIDTH, SCR_HEIGHT, "R3ndr");
 TextRenderer textRenderer(SCR_WIDTH, SCR_HEIGHT);
 
 
 // camera
-Camera camera(glm::vec3(0.0f, 0.0f, 1.0f));
+Camera camera(glm::vec3(0.0f, 0.0f, 8.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -46,6 +47,9 @@ bool firstMouse = true;
 float deltaTime = 0.0f; // time between current fra<me and last frame
 float lastFrame = 0.0f;
 
+Shader difuseLightShader(   "/home/jtsidis/dev/R3ndr/src/shaders/difuseLightShader.shader");
+Shader lightShader(         "/home/jtsidis/dev/R3ndr/src/shaders/baseShader.shader");
+Shader specularLightShader( "/home/jtsidis/dev/R3ndr/src/shaders/specularLighting.shader");
 
 int main()
 {
@@ -62,9 +66,23 @@ int main()
     Line* line3 = new Line(glm::vec3(0, 0, 0), glm::vec3(0, 0, 1));
     line3->setColor(glm::vec3(0, 0, 1));
     
-    Cube* cube= new Cube();
+    
+    Cube* lightSource = new Cube();
+    CubeWithNormal* difuseCube = new CubeWithNormal();
+    CubeWithNormal* specularCube = new CubeWithNormal();
 
+    glm::mat4 specularModel = glm::mat4(1.0f);
+    specularModel = glm::translate(specularModel, glm::vec3(-1, 0, 0));
 
+    glm::mat4 difuseModel = glm::mat4(1.0f);
+    difuseModel = glm::translate(difuseModel, glm::vec3(1, 0, 0));
+
+    glm::vec3 lightPos(0.5f, 1.0f, 0.0f);
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, lightPos);
+    model = glm::scale(model, glm::vec3(0.2f)); 
+    
+    float a = 0;
     while (!glfwWindowShouldClose(window))
     {
         auto currentFrame = static_cast<float>(glfwGetTime());
@@ -83,19 +101,50 @@ int main()
 
         glm::mat4 projection =  glm::perspective(glm::radians(camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
+        a = a+0.01;
+        lightPos.x = 4*cos(a);
+        lightPos.z = 4*sin(a);
 
-        cube->preRender();
-        cube->SetProjection(projection);
-        cube->SetView(view);
-        cube->render();
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, lightPos);
+        model = glm::scale(model, glm::vec3(0.2f));
 
-        line1->setMVP(view*projection);
-        line2->setMVP(view*projection);
-        line3->setMVP(view*projection);
+        lightShader.bind();
+        lightShader.setMat4("projection", projection);
+        lightShader.setMat4("view", view);
+        lightShader.setMat4("model", model);
+        lightSource->render();
 
-        line1->draw();
-        line2->draw();
-        line3->draw();
+        difuseLightShader.bind();
+        difuseLightShader.setMat4("projection", projection);
+        difuseLightShader.setMat4("view", view);
+        difuseLightShader.setMat4("model", difuseModel);
+
+        difuseLightShader.setVec3("objectColor", glm::vec3(1,0,0));
+        difuseLightShader.setVec3("lightColor", glm::vec3(1,1,1));
+        difuseLightShader.setVec3("lightPos", lightPos);
+        difuseCube->render();
+
+
+        specularLightShader.bind();
+        specularLightShader.setMat4("projection", projection);
+        specularLightShader.setMat4("view", view);
+        specularLightShader.setMat4("model", specularModel);
+
+        specularLightShader.setVec3("objectColor", glm::vec3(1,0,0));
+        specularLightShader.setVec3("lightColor", glm::vec3(1,1,1));
+        specularLightShader.setVec3("lightPos", lightPos);
+        specularLightShader.setVec3("viewPos", camera.GetPosition());
+        specularCube->render();
+
+
+        // line1->setMVP(view*projection);
+        // line2->setMVP(view*projection);
+        // line3->setMVP(view*projection);
+
+        // line1->draw();
+        // line2->draw();
+        // line3->draw();
 
 
         glfwSwapBuffers(window);
@@ -104,7 +153,8 @@ int main()
     delete line1;
     delete line2;
     delete line3;
-    delete cube;
+    delete lightSource;
+    delete difuseCube;
     glfwTerminate();
     return 0;
 }
@@ -138,6 +188,8 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height)
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
     textRenderer.SetProjectionMatrix(static_cast<float>(width), static_cast<float>(height));
+    SCR_HEIGHT = height;
+    SCR_WIDTH = width;
 }
 
 void mouse_callback(GLFWwindow *window, double xposIn, double yposIn)

@@ -2,6 +2,9 @@
 
 #include <glad/glad.h>
 
+
+#include "./shader.h"
+
 float cubeVertices[] = {
     -0.5f, -0.5f, -0.5f,
      0.5f, -0.5f, -0.5f,
@@ -48,7 +51,7 @@ float cubeVertices[] = {
 
 class Cube {
 public: 
-    Cube(){
+    Cube(): m_shader("/home/jtsidis/dev/R3ndr/src/shaders/baseShader.shader"){
         glCreateVertexArrays(1, &m_vao);
         glCreateBuffers(1, &m_vbo);
 
@@ -68,12 +71,25 @@ public:
         glDeleteVertexArrays(1, &m_vao);
     }
 
+    void const preRender() {
+        glUseProgram(m_shader.GetProgramId());
+    }
+
     void render() const{
         glBindVertexArray(m_vao);
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
 
+    void SetProjection(glm::mat4 projection) const {
+        m_shader.setMat4("projection", projection);
+    } 
+
+    void SetView(glm::mat4 view) const {
+        m_shader.setMat4("view", view);
+    } 
+
 private:
+    Shader m_shader;
     unsigned int m_vao;
     unsigned int m_vbo;
 };
