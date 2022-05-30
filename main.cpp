@@ -23,6 +23,8 @@
 #include "src/text_renderer.h"
 #include "src/cube.h"
 #include "src/cubeWithNormals.h"
+#include "src/mesh.h"
+#include "src/model.h"
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -77,7 +79,7 @@ int main()
     glm::mat4 difuseModel = glm::mat4(1.0f);
     difuseModel = glm::translate(difuseModel, glm::vec3(1, 0, 0));
 
-    glm::vec3 lightPos(0.5f, 1.0f, 0.0f);
+    glm::vec3 lightPos(0.5f, 2.0f, 0.0f);
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, lightPos);
     model = glm::scale(model, glm::vec3(0.2f)); 
