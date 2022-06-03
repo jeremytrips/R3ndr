@@ -53,8 +53,11 @@ Shader difuseLightShader(   "/home/jtsidis/dev/R3ndr/src/shaders/difuseLightShad
 Shader lightShader(         "/home/jtsidis/dev/R3ndr/src/shaders/baseShader.shader");
 Shader specularLightShader( "/home/jtsidis/dev/R3ndr/src/shaders/specularLighting.shader");
 
+
 int main()
 {
+    Model* test = new Model("/home/jtsidis/dev/R3ndr/assets/backpack/backpack.obj");
+
     GLFWwindow *window = win.getWindow();
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
