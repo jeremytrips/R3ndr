@@ -8,7 +8,7 @@
 
 
 TextRenderer::TextRenderer(float width, float height)
-    :m_shader("/home/jtsidis/dev/R3ndr/src/shaders/textShader.shader"),
+    :m_shader("/Users/jt.sidis/dev/R3ndr/src/shaders/textShader.shader"),
     m_projection(glm::ortho(0.0f, static_cast<float>(width), 0.0f, static_cast<float>(height)))
 {
 
@@ -20,7 +20,7 @@ TextRenderer::TextRenderer(float width, float height)
     }
 
     FT_Face face;
-    if (FT_New_Face(ft, "/home/jtsidis/dev/R3ndr/assets/font/font.ttf", 0, &face)) {
+    if (FT_New_Face(ft, "/Users/jt.sidis/dev/R3ndr/assets/font/font.ttf", 0, &face)) {
         std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
         exit(-1);
     }
