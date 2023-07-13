@@ -51,7 +51,7 @@ float cubeVertices[] = {
 
 class Cube {
 public: 
-    Cube(): m_shader("/home/jtsidis/dev/R3ndr/src/shaders/baseShader.shader"){
+    Cube(): m_shader("/Users/jt.sidis/dev/R3ndr/src/shaders/baseShader.shader"){
         glCreateVertexArrays(1, &m_vao);
         glCreateBuffers(1, &m_vbo);
 

@@ -49,14 +49,14 @@ bool firstMouse = true;
 float deltaTime = 0.0f; // time between current fra<me and last frame
 float lastFrame = 0.0f;
 
-Shader difuseLightShader(   "/home/jtsidis/dev/R3ndr/src/shaders/difuseLightShader.shader");
-Shader lightShader(         "/home/jtsidis/dev/R3ndr/src/shaders/baseShader.shader");
-Shader specularLightShader( "/home/jtsidis/dev/R3ndr/src/shaders/specularLighting.shader");
+Shader difuseLightShader(   "/Users/jt.sidis/dev/R3ndr/src/shaders/difuseLightShader.shader");
+Shader lightShader(         "/Users/jt.sidis/dev/R3ndr/src/shaders/baseShader.shader");
+Shader specularLightShader( "/Users/jt.sidis/dev/R3ndr/src/shaders/specularLighting.shader");
 
 
 int main()
 {
-    Model* test = new Model("/home/jtsidis/dev/R3ndr/assets/backpack/backpack.obj");
+    // Model* test = new Model("/Users/jt.sidis/dev/R3ndr/assets/backpack/backpack.obj");
 
     GLFWwindow *window = win.getWindow();
 
@@ -73,8 +73,8 @@ int main()
     
     
     Cube* lightSource = new Cube();
-    CubeWithNormal* difuseCube = new CubeWithNormal();
-    CubeWithNormal* specularCube = new CubeWithNormal();
+    // CubeWithNormal* difuseCube = new CubeWithNormal();
+    // CubeWithNormal* specularCube = new CubeWithNormal();
 
     glm::mat4 specularModel = glm::mat4(1.0f);
     specularModel = glm::translate(specularModel, glm::vec3(-1, 0, 0));
@@ -90,57 +90,57 @@ int main()
     float a = 0;
     while (!glfwWindowShouldClose(window))
     {
-        auto currentFrame = static_cast<float>(glfwGetTime());
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
+        // auto currentFrame = static_cast<float>(glfwGetTime());
+        // deltaTime = currentFrame - lastFrame;
+        // lastFrame = currentFrame;
 
-        // shader.setMat4("view", camera.GetViewMatrix());
-        processInput(window);
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        // // shader.setMat4("view", camera.GetViewMatrix());
+        // processInput(window);
+        // glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         char pos[150];
-        glm::vec3 camPos = camera.GetPosition();
-        sprintf(pos, "pos: %.2f %.2f %.2f", camPos.x, camPos.y, camPos.z);
+        // glm::vec3 camPos = camera.GetPosition();
+        sprintf(pos, "pos: %.2f %.2f %.2f", 0.013f, 0.053f, 0.034f);
         textRenderer.renderText(pos, glm::vec2(0, 0), 0.5);
 
-        glm::mat4 projection =  glm::perspective(glm::radians(camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-        glm::mat4 view = camera.GetViewMatrix();
-        a = a+0.01;
-        lightPos.x = 4*cos(a);
-        lightPos.z = 4*sin(a);
+        // glm::mat4 projection =  glm::perspective(glm::radians(camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        // glm::mat4 view = camera.GetViewMatrix();
+        // a = a+0.01;
+        // lightPos.x = 4*cos(a);
+        // lightPos.z = 4*sin(a);
 
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, lightPos);
-        model = glm::scale(model, glm::vec3(0.2f));
+        // model = glm::mat4(1.0f);
+        // model = glm::translate(model, lightPos);
+        // model = glm::scale(model, glm::vec3(0.2f));
 
-        lightShader.bind();
-        lightShader.setMat4("projection", projection);
-        lightShader.setMat4("view", view);
-        lightShader.setMat4("model", model);
-        lightSource->render();
+        // lightShader.bind();
+        // lightShader.setMat4("projection", projection);
+        // lightShader.setMat4("view", view);
+        // lightShader.setMat4("model", model);
+        // lightSource->render();
 
-        difuseLightShader.bind();
-        difuseLightShader.setMat4("projection", projection);
-        difuseLightShader.setMat4("view", view);
-        difuseLightShader.setMat4("model", difuseModel);
+        // difuseLightShader.bind();
+        // difuseLightShader.setMat4("projection", projection);
+        // difuseLightShader.setMat4("view", view);
+        // difuseLightShader.setMat4("model", difuseModel);
 
-        difuseLightShader.setVec3("objectColor", glm::vec3(1,0,0));
-        difuseLightShader.setVec3("lightColor", glm::vec3(1,1,1));
-        difuseLightShader.setVec3("lightPos", lightPos);
-        difuseCube->render();
+        // difuseLightShader.setVec3("objectColor", glm::vec3(1,0,0));
+        // difuseLightShader.setVec3("lightColor", glm::vec3(1,1,1));
+        // difuseLightShader.setVec3("lightPos", lightPos);
+        // difuseCube->render();
 
 
-        specularLightShader.bind();
-        specularLightShader.setMat4("projection", projection);
-        specularLightShader.setMat4("view", view);
-        specularLightShader.setMat4("model", specularModel);
+        // specularLightShader.bind();
+        // specularLightShader.setMat4("projection", projection);
+        // specularLightShader.setMat4("view", view);
+        // specularLightShader.setMat4("model", specularModel);
 
-        specularLightShader.setVec3("objectColor", glm::vec3(1,0,0));
-        specularLightShader.setVec3("lightColor", glm::vec3(1,1,1));
-        specularLightShader.setVec3("lightPos", lightPos);
-        specularLightShader.setVec3("viewPos", camera.GetPosition());
-        specularCube->render();
+        // specularLightShader.setVec3("objectColor", glm::vec3(1,0,0));
+        // specularLightShader.setVec3("lightColor", glm::vec3(1,1,1));
+        // specularLightShader.setVec3("lightPos", lightPos);
+        // specularLightShader.setVec3("viewPos", camera.GetPosition());
+        // specularCube->render();
 
 
         // line1->setMVP(view*projection);
@@ -155,11 +155,11 @@ int main()
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-    delete line1;
-    delete line2;
-    delete line3;
-    delete lightSource;
-    delete difuseCube;
+    // delete line1;
+    // delete line2;
+    // delete line3;
+    // delete lightSource;
+    // delete difuseCube;
     glfwTerminate();
     return 0;
 }
@@ -171,18 +171,18 @@ void processInput(GLFWwindow *window)
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.ProcessKeyboard(FORWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.ProcessKeyboard(BACKWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.ProcessKeyboard(LEFT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.ProcessKeyboard(RIGHT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        camera.ProcessKeyboard(UP, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        camera.ProcessKeyboard(DOWN, deltaTime);
+    // if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    //     camera.ProcessKeyboard(FORWARD, deltaTime);
+    // if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    //     camera.ProcessKeyboard(BACKWARD, deltaTime);
+    // if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    //     camera.ProcessKeyboard(LEFT, deltaTime);
+    // if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    //     camera.ProcessKeyboard(RIGHT, deltaTime);
+    // if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+    //     camera.ProcessKeyboard(UP, deltaTime);
+    // if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+    //     camera.ProcessKeyboard(DOWN, deltaTime);
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -216,12 +216,12 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn)
     lastX = xpos;
     lastY = ypos;
 
-    camera.ProcessMouseMovement(xoffset, yoffset);
+    // camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
 // ----------------------------------------------------------------------
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
 {
-    camera.ProcessMouseScroll(static_cast<float>(yoffset));
+    // camera.ProcessMouseScroll(static_cast<float>(yoffset));
 }
